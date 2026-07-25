@@ -1,0 +1,178 @@
+§
+    ÖöDj5  ã                   óÐ   — d Z ddlZddlZddlZddlmZm Z  dZdej	        dej	        fd „Z
+dej	        dej	        dz   fd	„Z
+d
+ed
+e
+defd
+„Zddedefd„Zddededej	        dz   fd„ZdS )a  
+Projector Calibration
+----------------------
+Detects the exact floor area the projector is throwing light onto,
+using structured light (black then white projector frames, camera diff).
+Returns the 4 corner points of the projection quad in camera-pixel space.
+
+This is still needed even with a depth sensor, because the depth sensor
+tells you WHERE objects are in 3D space, but you still need to know
+WHICH PIXELS in the camera view correspond to which pixels in the
+projector output. That mapping comes from this calibration step.
+é    N)ÚCALIBRATION_SETTLE_SECÚCALIBRATION_DIFF_THRESHzAPCS Projection OutputÚptsÚreturnc                 óì  — |                       dd¦  «                             t          j        ¦  «        } |                      d¬¦  «        }t          j        | d¬¦  «        }t          j        dt          j        ¬¦  «        }| t          j         |¦  «                 |d <   | t          j         |¦  «                 |d<   | t          j        |¦  «                 |d<   | t          j        |¦  «                 |d<   |S )	Né   é   é   )Úaxis)r   r	   ©Údtyper   é   )	Ú reshapeÚastypeÚnpÚ float32ÚsumÚdiffÚzerosÚargminÚargmax)r   Úsr   Ú ordereds       ú*C:\Users\Admin\Desktop\APCS\calibration.pyÚ
+order_cornersr      s½   € Ø
+
++Š+a˜Ñ
+Ô
+×
+"Ò
+"¥2¤:Ñ
+.Ô
+.€CØ
+ Š Qˆ ‰Œ€AÝ
+
+Œ73˜QÐ
+Ñ
+Ô
+€DÝŒhv¥R¤ZÐ0Ñ0Ô0€GØ•R”Y˜q‘\”\Ô"€GˆAJØ•R”Y˜t‘_”_Ô%€GˆAJØ•R”Y˜q‘\”\Ô"€GˆAJØ•R”Y˜t‘_”_Ô%€GˆAJØ
+€Nó    Úmaskc                 ó  — t          j        | t           j        t           j        ¦  «        \  }}|sd S | j        d         | j        d         z  }d\  }}|D ]¸}t          j        |¦  «        } | |dz  k     rŒ t          j        |d¦  «        }t          j         |d|z  d¦  «        }	t          |	¦  «        d k    rt          j         |d|z  d¦  «        }	t          |	¦  «        d k    rt          j	        |	¦  «        r
+| |k    r| |	}}Œ¬| |k    r|€| |}}Œ¹|€d S t          |¦  «        d k    rt          |¦  «        S t          j
+        |¦  «        }
+t          j        |
+¦  «        }
+t          t          j        |
+t          j        ¬	¦  «        ¦  «        S )
+Nr   r
+   )Nr   g{®Gáz„?Tg{®Gáz”?r   g{®Gáz¤?r   )Úcv2ÚfindContoursÚ
+RETR_EXTERNALÚCHAIN_APPROX_SIMPLEÚshapeÚ
+contourAreaÚ	arcLengthÚapproxPolyDPÚlenÚisContourConvexr   Ú
+minAreaRectÚ	boxPointsr   Úarrayr   )r   ÚcontoursÚ_Ú
+frame_areaÚbestÚ	best_areaÚcntÚareaÚperiÚapproxÚrectÚboxs               r   Ú
+_largest_quadr7   #   s‚  € ÝÔ" 4­Ô):½CÔ<SÑTÔTK€HˆaØ
+ð Øˆtà”˜A” ¤¨A¤Ñ.€JØO€Dˆ)àð 
+(ð 
+(ˆÝŒ˜sÑ#Ô#ˆØ
+*˜tÑ#Ò
+#Ð
+#ØÝŒ}˜S $Ñ'Ô'ˆÝÔ! # t¨d¡{°DÑ9Ô9ˆÝ
+ˆv‰;Œ;˜!Ò
+Ð
+ÝÔ% c¨4°$©;¸Ñ=Ô=ˆFÝ
+ˆv‰;Œ;˜!Ò
+Ð
+¥Ô 3°FÑ ;Ô ;Ð
+ÀÀyÒ@PÐ@PØ" FtˆIˆIØ
+IÒ
+Ð
+ $ ,Ø" CtˆIøà 
+€|ØˆtÝ 
+ˆ4y„yA‚~€~Ý˜TÑ"Ô"Ð"Ý
+Œ?˜4Ñ
+ Ô
+ €DÝ
+
+Œ-˜Ñ
+Ô
+€CÝ
+œ #­R¬ZÐ8Ñ8Ô8Ñ
+9Ô
+9Ð9r   ÚcolorÚdurationÚsizec                 óÜ   — |\  }}t          j        ||df| t           j        ¬¦  «        }t           j        t
+          |¦  «         t           j        d¦  «         t          j        |¦  «         d S )Nr   r   r
+   )	r   ÚfullÚuint8r   ÚimshowÚPROJECTION_WINDOWÚ waitKeyÚtimeÚsleep)r8   r9   r:   ÚwÚhÚframes         r   Ú
+_show_solidrF   A   s_   € Ø
+D€A€qÝŒGQ˜˜1I˜u­B¬HÐ5Ñ5Ô5€EÝ „JÕ  %Ñ(Ô(Ð(Ý „KN„N€NÝ„JˆxÑÔÐÐÐr   é   é   Ú
+settle_framesÚ retriesc                 óÖ   — d }d\  }}||k     r[||k     rU	 |                       ¦   «         \  }} |}|dz
+  }n$# t          $ r t          j        d¦  «         Y nw xY w|dz
+  }||k     r||k     °U|S )N)r   r   r
+   g¸…ëQ¸ž?)Ú
+get_framesÚ	ExceptionrA   rB   )ÚsensorrI   rJ   rE   ÚgoodÚattemptsr8   r-   s           r   Ú_grab_stablerQ   I   s§   € Ø€EØN€Dˆ(Ø
+Ò
+Ð
+ 8¨gÒ#5Ð#5ð	Ø×(Ò(Ñ*Ô*‰HˆE1ØˆEØA‰IˆDˆDøÝð 	ð 	ð 	ÝŒJtÑÔÐÐÐð	øøøàA‰
+ˆð 
+Ò
+Ð
+ 8¨gÒ#5Ð#5ð €Ls   •4 ´AÁAFÚ
+output_sizeÚ
+save_debugc                  ó  — t          d¦  «         t          dt          |¦  «         t           | ¦  «        }t          d¦  «         t          dt          |¦  «         t           | ¦  «        }||€t          d¦  «         dS t	          j        |t          j        ¦  «        }t	          j        |t          j        ¦  «        }t	          j         t	          j        ||¦  «        d d¦  «        } t	          j	        | t          d	t          j
+        ¦  «        \  }}	t          j
+        d
+t          j        ¦  «        }
+t	          j        |	t          j        |
+d
+¬¦  «        }	t	          j        |	t          j        |
+d
+¬¦  «        }	|rxt	          j        d|¦  «         t	          j        d|¦  «         t	          j        d| ¦  «         t	          j        d|	¦  «         t          d|                      ¦   «         › ¦  «         t)          |	¦  «        }
+|
+€zt          d¦  «         t          d|                      ¦   «         › dt          › d¦  «         |                      ¦   «         t          k     rt          d¦  «         nt          d¦  «         dS t          d¦  «         |
+S )z´
+    Runs the black/white structured-light calibration sequence.
+    Returns 4 ordered corner points (TL, TR, BR, BL) in camera-pixel
+    space, or None if calibration failed.
+    z<[CALIBRATE] Projecting BLACK - capturing ambient baseline...)r   r   r   z8[CALIBRATE] Projecting WHITE - capturing lit baseline...)éÿ   rU   rU   NzH[CALIBRATE] ERROR: Could not read frames from sensor during calibration.)é   rV   r   rU   )é    rW   r   )Ú
+iterationsr	   z
+debug_off.pngzdebug_on.pngzdebug_diff.pngzdebug_mask.pngz/[CALIBRATE] Debug images saved. Max diff seen: z9[CALIBRATE] ERROR: Could not find projector throw region.z'            Max brightness difference: z
+ (threshold: ú)zt            HINT: The projection window may not be fullscreen on the projector. Set PROJECTION_MONITOR in config.py.zD            HINT: Try lowering CALIBRATION_DIFF_THRESH in config.py.z,[CALIBRATE] Done. Projection quad locked in.)ÚprintrF   r   rQ   r   ÚcvtColorÚCOLOR_BGR2GRAYÚGaussianBlurÚsubtractÚ	thresholdr   Ú
+THRESH_BINARYr   Úonesr=   ÚmorphologyExÚ
+MORPH_CLOSEÚ
+MORPH_OPENÚ imwriteÚmaxr7   )rN   rR   rS   Ú	off_frameÚon_frameÚoff_grayÚ on_grayr   r-   r   ÚkernelÚ cornerss               r   Ú	calibraterm   W   s^  € õ 
+Ð
+HÑIÔIÐIÝ	Õ1°;Ñ?Ô?Ð?Ý˜VÑ$Ô$€Iå	Ð
+DÑEÔEÐEÝÕ!7¸ÑEÔEÐEÝ˜FÑ#Ô#€Hà Ð ˜HÐ,Ý
+ÐXÑYÔYÐYØˆtåŒ|˜I¥sÔ'9Ñ:Ô:€HÝŒl˜8¥SÔ%7Ñ8Ô8€GÝ
+Ô
+CœL¨°(Ñ;Ô;¸VÀQÑ
+GÔ
+G€DåŒm˜DÕ"9¸3ÅÔ@QÑRÔRG€A€tÝ
+ŒWVRœXÑ
+&Ô
+&€FÝ
+Ô
+˜D¥#¤/°6ÀaÐ
+HÑ
+HÔ
+H€DÝ
+Ô
+˜D¥#¤.°&ÀQÐ
+GÑ
+GÔ
+G€Dà ð NÝ
+Œ
+O YÑ/Ô/Ð/Ý
+Œ
+N HÑ-Ô-Ð-Ý
+Œ
+Ð$ dÑ+Ô+Ð+Ý
+Œ
+Ð$ dÑ+Ô+Ð+Ý
+ÐLÀÇÂÁ
+Ä
+ÐLÐLÑMÔMÐMå˜DÑ!Ô!€Gà €Ý
+ÐJÑKÔKÐKÝ
+ð 8¸¿º¹
+¼
+ð 8ð 8Ý4ð8ð 8ð 8ñ 	9ô 	9ð 	9à
+8Š8‰:Œ:Õ/Ò
+/Ð
+/Ýð Hñ 
+Iô 
+Ið 
+Ið 
+Iõ 
+ÐXÑYÔYÐYØˆtå	Ð
+8Ñ9Ô9Ð9Ø
+€Nr   )rG   rH   )F)Ú __doc__rA   r   Únumpyr   Úconfigr   r   r?   Ú ndarrayr   r7   ÚtupleÚfloatrF   ÚintrQ   Úboolrm   © r   r   ú<module>rw      s.  ðð
+ð 
+ð €
+€
+€
+Ø 
+€
+€
+€
+Ø Ð Ð Ð à BÐ BÐ BÐ BÐ BÐ BÐ BÐ Bà,Ð ð	r”zð 	 b¤jð 	ð 	ð 	ð 	ð:˜œ
+ð : r¤z°DÑ'8ð :ð :ð :ð :ð<uð ¨ð °Uð ð ð ð ð
+ð 
+¨ð 
+¸#ð 
+ð 
+ð 
+ð 
+ð0ð 0 5ð 0°dð 0ÀrÄzÐTXÑGXð 0ð 0ð 0ð 0ð 0ð 0r   
